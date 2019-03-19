@@ -1,4 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import User
 from Config import token
 import logging
 
@@ -30,10 +31,21 @@ def rules(bot, update):
         bot.send_message(update.message.chat_id, text=rules)
 
 
+def report(bot, update):
+    for entity in update.message.entities:
+        if entity.type == 'mention':
+           offset = entity.offset
+           length = entity.length
+
+           username = update.message.text[offset:offset+length]
+           bot.send_message(update.message.chat_id, text=username + " ist in die Hölle geschickt worden!")
+
+
 dispatcher.add_handler(MessageHandler(Filters.status_update.new_chat_members, joinAlert))
 dispatcher.add_handler(CommandHandler('start', start))
 dispatcher.add_handler(CommandHandler('rules', rules))
 dispatcher.add_handler(CommandHandler('regel', rules))
 dispatcher.add_handler(CommandHandler('greeting', greeting))
+dispatcher.add_handler(CommandHandler('report', report))
 
 updater.start_polling()
